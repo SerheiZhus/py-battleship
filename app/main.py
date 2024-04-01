@@ -1,14 +1,15 @@
 class Deck:
-    def __init__(self, row: int, column: int, is_alive: bool = True) -> None:
+    def __init__(self, row: int,
+                 column: int,
+                 is_alive: bool = True
+                 ) -> None:
         self.row = row
         self.column = column
         self.is_alive = is_alive
 
 
 class Ship:
-    def __init__(self,
-                 start: tuple,
-                 end: tuple,
+    def __init__(self, start: int, end: int,
                  is_drowned: bool = False) -> None:
         self.decks = [Deck(row, column) for row in range(start[0], end[0] + 1)
                       for column in range(start[1], end[1] + 1)]
@@ -28,32 +29,22 @@ class Ship:
 
 class Battleship:
     def __init__(self, ships: list[tuple]) -> None:
-        self.field = [["~" for _ in range(10)] for _ in range(10)]
-        self.ships = [self._create_ship(start, end) for start, end in ships]
-        self._validate_field()
+        self.field = {}
+        self.ships = [Ship(start, end) for start, end in ships]
+        for ship in self.ships:
+            for deck in ship.decks:
+                self.field[(deck.row, deck.column)] = ship
 
-    def _create_ship(self, start: tuple, end: tuple) -> list[tuple]:
-        ship = [(row, column) for row in range(start[0],
-                end[0] + 1) for column in range(start[1], end[1] + 1)
-                ]
-        for row, column in ship:
-            self.field[row][column] = "□"
-        return ship
-
-    def fire(self, ceil: tuple) -> str:
-        row, column = ceil
-        if self.field[row][column] == "~":
-            return "Miss!"
-        elif self.field[row][column] == "□":
-            self.field[row][column] = "*"
-            if self._is_sunk(ceil):
-                for ship in self.ships:
-                    if ceil in ship:
-                        for row, column in ship:
-                            self.field[row][column] = "x"
+    def fire(self, location: tuple) -> str:
+        ship = self.field.get(location)
+        if ship:
+            ship.fire(*location)
+            if ship.is_drowned:
                 return "Sunk!"
             else:
                 return "Hit!"
+        else:
+            return "Miss!"
 
     def _is_sunk(self, ceil: tuple) -> bool:
         for ship in self.ships:
