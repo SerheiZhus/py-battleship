@@ -29,11 +29,12 @@ class Ship:
 
 class Battleship:
     def __init__(self, ships: list[tuple]) -> None:
-        self.field = {}
-        self.ships = [Ship(start, end) for start, end in ships]
-        for ship in self.ships:
-            for deck in ship.decks:
-                self.field[(deck.row, deck.column)] = ship
+        self.field = {
+            (deck.row, deck.column):
+                ship for ship in [Ship(start, end)
+                                  for start, end in ships]
+            for deck in ship.decks
+        }
 
     def fire(self, location: tuple) -> str:
         ship = self.field.get(location)
@@ -43,13 +44,13 @@ class Battleship:
                 return "Sunk!"
             else:
                 return "Hit!"
-        else:
-            return "Miss!"
+        return "Miss!"
 
     def _is_sunk(self, ceil: tuple) -> bool:
         for ship in self.ships:
-            if ceil in ship and all(self.field[row][column]
-                                    == "*" for row, column in ship):
+            if (ceil in ship
+                    and all(self.field[row][column]
+                            == "*" for row, column in ship)):
                 return True
         return False
 
@@ -71,5 +72,5 @@ class Battleship:
                         if ((point_x, point_y) not in ship
                                 and self.field[point_x][point_y] != "~"):
                             raise ValueError("Ships are too close")
-        assert all(count == 0 for count in ship_counts), \
-            "Invalid number of ships"
+        assert (all(count == 0 for count in ship_counts),
+                "Invalid number of ships")
