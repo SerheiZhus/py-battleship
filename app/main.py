@@ -72,5 +72,5 @@ class Battleship:
                         if ((point_x, point_y) not in ship
                                 and self.field[point_x][point_y] != "~"):
                             raise ValueError("Ships are too close")
-        assert (all(count == 0 for count in ship_counts),
-                "Invalid number of ships")
+        assert all(count == 0 for count in ship_counts), ("Invalid "
+                                                          "number of ships")
