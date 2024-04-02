@@ -23,8 +23,7 @@ class Ship:
         deck = self.get_deck(row, column)
         if deck:
             deck.is_alive = False
-            if all(not deck.is_alive for deck in self.decks):
-                self.is_drowned = True
+        self.is_drowned = all(not deck.is_alive for deck in self.decks)
 
 
 class Battleship:
@@ -42,8 +41,7 @@ class Battleship:
             ship.fire(*location)
             if ship.is_drowned:
                 return "Sunk!"
-            else:
-                return "Hit!"
+            return "Hit!"
         return "Miss!"
 
     def _is_sunk(self, ceil: tuple) -> bool:
